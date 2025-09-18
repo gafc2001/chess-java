@@ -1,0 +1,44 @@
+package modelos.piezas;
+
+import enums.Color;
+import enums.TipoPieza;
+import modelos.Posicion;
+import modelos.Tablero;
+
+import java.util.List;
+
+public abstract class Pieza {
+    protected Color color;
+    protected Posicion posicion;
+    protected TipoPieza tipo;
+    
+    public Pieza(Color color, Posicion posicion, TipoPieza tipo) {
+        this.color = color;
+        this.posicion = posicion;
+        this.tipo = tipo;
+    }
+    
+    public abstract List<Posicion> getMovimientosPosibles(Tablero tablero);
+    public abstract boolean esMovimientoValido(Posicion destino, Tablero tablero);
+    
+    public void mover(Posicion nuevaPosicion) {
+        this.posicion = nuevaPosicion;
+    }
+    
+    protected boolean esEnemiga(Pieza otraPieza) {
+        return otraPieza != null && this.color != otraPieza.color;
+    }
+    
+    protected boolean esAliada(Pieza otraPieza) {
+        return otraPieza != null && this.color == otraPieza.color;
+    }
+    
+    public Color getColor() { return color; }
+    public Posicion getPosicion() { return posicion; }
+    public TipoPieza getTipo() { return tipo; }
+    
+    @Override
+    public String toString() {
+        return tipo + " " + color;
+    }
+}
