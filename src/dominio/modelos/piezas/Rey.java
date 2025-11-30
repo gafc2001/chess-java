@@ -1,17 +1,17 @@
-package modelos.piezas;
+package dominio.modelos.piezas;
 
-import enums.Color;
-import enums.TipoPieza;
-import modelos.Posicion;
-import modelos.Tablero;
+import dominio.enums.Color;
+import dominio.enums.TipoPieza;
+import dominio.modelos.Posicion;
+import dominio.modelos.Tablero;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class Peon extends Pieza {
+public class Rey extends Pieza {
     
-    public Peon(Color color, Posicion posicion) {
-        super(color, posicion, TipoPieza.PEON);
+    public Rey(Color color, Posicion posicion) {
+        super(color, posicion, TipoPieza.REY);
     }
     
     @Override

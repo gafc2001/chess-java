@@ -1,4 +1,4 @@
-package enums;
+package dominio.enums;
 
 public enum EstadoJuego {
     EN_PROGRESO,

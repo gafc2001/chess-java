@@ -1,7 +1,7 @@
-package modelos;
+package dominio.modelos;
 
-import enums.Color;
-import enums.EstadoJuego;
+import dominio.enums.Color;
+import dominio.enums.EstadoJuego;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;

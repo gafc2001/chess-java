@@ -1,6 +1,6 @@
-import modelos.*;
-import modelos.piezas.*;
-import enums.*;
+import dominio.modelos.*;
+import dominio.modelos.piezas.*;
+import dominio.enums.*;
 
 public class Main {
     public static void main(String[] args) {

@@ -1,4 +1,4 @@
-package modelos;
+package dominio.modelos;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;

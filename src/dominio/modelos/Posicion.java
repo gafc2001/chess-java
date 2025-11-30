@@ -1,4 +1,4 @@
-package modelos;
+package dominio.modelos;
 
 public class Posicion {
     private int fila;

@@ -1,7 +1,7 @@
-package modelos;
+package dominio.modelos;
 
-import enums.Color;
-import modelos.piezas.*;
+import dominio.enums.Color;
+import dominio.modelos.piezas.*;
 
 public class Tablero {
     private Pieza[][] tablero;
