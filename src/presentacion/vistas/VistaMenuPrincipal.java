@@ -4,6 +4,8 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.border.LineBorder;
+
+import dominio.modelos.Usuario;
 import shared.utils.ImageUtil;
 
 public class VistaMenuPrincipal extends JFrame {
@@ -15,11 +17,7 @@ public class VistaMenuPrincipal extends JFrame {
     public VistaMenuPrincipal() {
         initComponents();
         
-        // Cargar logo (se ajustará al tamaño del label cuando se muestre)
-        // Usamos un timer o invokeLater para asegurar que el componente tenga tamaño, 
-        // o usamos un tamaño fijo para el logo.
         String rutaLogo = "assets/images/img_logo.png";
-        // Damos un tamaño preferido al logo para que ImageUtil tenga dimensiones base
         jLabel_logo.setSize(200, 100); 
         ImageUtil.escalarImg(jLabel_logo, rutaLogo);
     }
@@ -27,13 +25,12 @@ public class VistaMenuPrincipal extends JFrame {
     private void initComponents() {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setUndecorated(true);
-        setExtendedState(JFrame.MAXIMIZED_BOTH); // Pantalla completa
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
 
         jPanel_fondo = new JPanel();
         jPanel_fondo.setBackground(Color.WHITE);
         jPanel_fondo.setLayout(new BorderLayout());
 
-        // --- Botón Cerrar (Top Right) ---
         JPanel pnlTop = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 10));
         pnlTop.setBackground(Color.WHITE);
         
@@ -50,7 +47,6 @@ public class VistaMenuPrincipal extends JFrame {
         pnlTop.add(lblCerrar);
         jPanel_fondo.add(pnlTop, BorderLayout.NORTH);
 
-        // --- Contenido Central ---
         JPanel pnlCentro = new JPanel();
         pnlCentro.setBackground(Color.WHITE);
         pnlCentro.setLayout(new GridBagLayout());
@@ -58,34 +54,36 @@ public class VistaMenuPrincipal extends JFrame {
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = GridBagConstraints.RELATIVE;
-        gbc.insets = new Insets(15, 0, 15, 0); // Espacio vertical entre elementos
+        gbc.insets = new Insets(15, 0, 15, 0);
         gbc.anchor = GridBagConstraints.CENTER;
 
-        // 1. Logo
         jLabel_logo = new JLabel();
         jLabel_logo.setPreferredSize(new Dimension(200, 100));
         jLabel_logo.setHorizontalAlignment(SwingConstants.CENTER);
         pnlCentro.add(jLabel_logo, gbc);
 
-        // 2. Título
         jLabel_titulo = new JLabel("MENÚ PRINCIPAL");
         jLabel_titulo.setFont(new Font("Roboto Medium", Font.BOLD, 36));
         jLabel_titulo.setHorizontalAlignment(SwingConstants.CENTER);
         pnlCentro.add(jLabel_titulo, gbc);
 
-        // Espacio extra antes de los botones
         gbc.insets = new Insets(30, 0, 15, 0);
 
-        // 3. Botones Verticales
         pnlCentro.add(crearBoton("JUGAR 1vs1", true, e -> {
             new VistaJuego().mostrar();
             dispose();
         }), gbc);
         
-        gbc.insets = new Insets(15, 0, 15, 0); // Restaurar insets normales
-        pnlCentro.add(crearBoton("MI PERFIL", false, e -> System.out.println("Perfil")), gbc);
-        pnlCentro.add(crearBoton("RANKING", false, e -> System.out.println("Ranking")), gbc);
-        pnlCentro.add(crearBoton("CERRAR SESIÓN", false, e -> dispose()), gbc);
+        gbc.insets = new Insets(15, 0, 15, 0);
+        pnlCentro.add(crearBoton("MI PERFIL", false, e -> {
+            new VistaEditarPerfil(new Usuario("aramirez", "Alma", "Ramirez Arias", "123456")).mostrar();
+            dispose();
+        }), gbc);
+        pnlCentro.add(crearBoton("RANKING", false, e -> {
+            new VistaRanking().mostrar();
+            dispose();
+        }), gbc);
+        pnlCentro.add(crearBoton("CERRAR SESIÓN", false, e -> System.out.println("Ranking")), gbc);
 
         jPanel_fondo.add(pnlCentro, BorderLayout.CENTER);
 
@@ -95,7 +93,7 @@ public class VistaMenuPrincipal extends JFrame {
     private JPanel crearBoton(String texto, boolean esPrincipal, ActionListener accion) {
         JPanel panel = new JPanel();
         panel.setLayout(new BorderLayout());
-        panel.setPreferredSize(new Dimension(300, 60)); // Botones más anchos y altos
+        panel.setPreferredSize(new Dimension(300, 60));
         panel.setCursor(new Cursor(Cursor.HAND_CURSOR));
         
         if (esPrincipal) {
@@ -115,7 +113,6 @@ public class VistaMenuPrincipal extends JFrame {
             label.setForeground(Color.BLACK);
         }
 
-        // Eventos del Mouse para efecto Hover y Click
         panel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {

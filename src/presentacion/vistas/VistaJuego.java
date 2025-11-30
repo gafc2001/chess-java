@@ -27,7 +27,6 @@ public class VistaJuego extends JFrame {
         setExtendedState(JFrame.MAXIMIZED_BOTH);
 
         JPanel mainPanel = new JPanel(new GridBagLayout());
-        // mainPanel.setBackground(Color.DARK_GRAY);
         
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.BOTH;
@@ -45,12 +44,10 @@ public class VistaJuego extends JFrame {
         pnlInfo = new JPanel(new GridLayout(2, 1));
         pnlInfo.setBackground(Color.WHITE);
         
-        // Info Jugador 2 (Negras - Arriba)
-        JPanel pnlJugador2 = crearPanelJugador("Jugador 2 (Negras)", "assets/images/user.png"); // Placeholder img
+        JPanel pnlJugador2 = crearPanelJugador("Jugador 2 (Negras)", "assets/images/user.png");
         pnlInfo.add(pnlJugador2);
         
-        // Info Jugador 1 (Blancas - Abajo)
-        JPanel pnlJugador1 = crearPanelJugador("Jugador 1 (Blancas)", "assets/images/user.png"); // Placeholder img
+        JPanel pnlJugador1 = crearPanelJugador("Jugador 1 (Blancas)", "assets/images/user.png");
         pnlInfo.add(pnlJugador1);
 
         gbc.gridx = 1;
@@ -62,18 +59,15 @@ public class VistaJuego extends JFrame {
             new VistaMenuPrincipal().mostrar();
             dispose();
         });
-        // Añadir el botón al panel de info (chapuza rápida para que esté accesible)
         JPanel pnlBoton = new JPanel();
         pnlBoton.add(btnSalir);
-        pnlInfo.add(pnlBoton, 0); // Lo metemos arriba del todo o lo gestionamos mejor luego
-        // Corrección: GridLayout(2,1) no deja espacio. Mejor usar un BorderLayout en pnlInfo.
+        pnlInfo.add(pnlBoton, 0);
         pnlInfo.setLayout(new BorderLayout());
         pnlInfo.removeAll();
         
         JPanel pnlTopRight = new JPanel(new BorderLayout());
         pnlTopRight.add(pnlJugador2, BorderLayout.CENTER);
         
-        // Boton cerrar en la esquina superior derecha
         JLabel lblCerrar = new JLabel("X  ");
         lblCerrar.setFont(new Font("Arial", Font.BOLD, 20));
         lblCerrar.setCursor(new Cursor(Cursor.HAND_CURSOR));
@@ -89,7 +83,6 @@ public class VistaJuego extends JFrame {
         pnlInfo.add(pnlTopRight, BorderLayout.NORTH);
         pnlInfo.add(pnlJugador1, BorderLayout.SOUTH);
         
-        // Un panel central en la derecha para historial o chat
         JPanel pnlExtra = new JPanel();
         pnlExtra.setBackground(Color.LIGHT_GRAY);
         pnlExtra.add(new JLabel("Historial de Movimientos"));
@@ -104,12 +97,11 @@ public class VistaJuego extends JFrame {
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         panel.setBorder(BorderFactory.createTitledBorder(nombre));
         panel.setBackground(Color.WHITE);
-        panel.setPreferredSize(new Dimension(0, 150)); // Altura fija
+        panel.setPreferredSize(new Dimension(0, 150));
         
         JLabel lblAvatar = new JLabel();
         lblAvatar.setPreferredSize(new Dimension(50, 50));
         lblAvatar.setBorder(new LineBorder(Color.BLACK));
-        // ImageUtil.escalarImg(lblAvatar, imgPath); // Si existe la imagen
         lblAvatar.setText("IMG");
         
         JLabel lblNombre = new JLabel(nombre);
@@ -140,16 +132,13 @@ public class VistaJuego extends JFrame {
     }
 
     private void colocarPiezasIniciales() {
-        // Orden de piezas: Torre, Caballo, Alfil, Reina, Rey, Alfil, Caballo, Torre
         String[] piezas = {"torre", "caballo", "alfin", "reina", "rey", "alfin", "caballo", "torre"};
         
-        // Negras (Fila 0 y 1)
         for (int i = 0; i < 8; i++) {
             colocarPieza(0, i, piezas[i], "negro");
             colocarPieza(1, i, "peon", "negro");
         }
 
-        // Blancas (Fila 6 y 7)
         for (int i = 0; i < 8; i++) {
             colocarPieza(6, i, "peon", "blanco");
             colocarPieza(7, i, piezas[i], "blanco");
@@ -161,19 +150,7 @@ public class VistaJuego extends JFrame {
         JLabel lblPieza = new JLabel();
         lblPieza.setHorizontalAlignment(SwingConstants.CENTER);
         
-        // Usamos ImageUtil. Como el tamaño de la casilla es dinámico, 
-        // idealmente deberíamos reescalar cuando el componente cambie de tamaño.
-        // Por simplicidad ahora, forzaremos un tamaño o dejaremos que ImageUtil lo intente.
-        // ImageUtil necesita que el label tenga tamaño. Al inicio es 0.
-        // Vamos a usar un truco: poner un Icon que cargue la imagen.
-        
-        // Mejor opción: Crear una clase JLabel personalizada que pinte la imagen escalada
-        // O llamar a ImageUtil después de que la ventana sea visible.
-        // Vamos a intentar usar ImageUtil con un tamaño estimado o fijo por ahora,
-        // ya que en pantalla completa las casillas serán grandes.
-        
-        // Estimación: Pantalla 1920x1080 -> Tablero ~1000px -> Casilla ~120px
-        lblPieza.setSize(80, 80); // Tamaño base para que ImageUtil funcione
+        lblPieza.setSize(80, 80);
         ImageUtil.escalarImgMantenerProporcion(lblPieza, ruta);
         
         casillas[fila][col].add(lblPieza, BorderLayout.CENTER);
@@ -181,7 +158,5 @@ public class VistaJuego extends JFrame {
 
     public void mostrar() {
         this.setVisible(true);
-        // Forzar repintado de imágenes una vez visible para ajustar tamaños si fuera necesario
-        // (Implementación futura para responsive real)
     }
 }

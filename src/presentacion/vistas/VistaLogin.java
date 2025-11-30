@@ -85,7 +85,7 @@ public class VistaLogin extends javax.swing.JFrame {
             }
         });
 
-        jLabel5.setFont(new java.awt.Font("Roboto Light", 0, 24)); // NOI18N
+        jLabel5.setFont(new java.awt.Font("Roboto Light", 0, 24));
         jLabel5.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel5.setText("X");
         jLabel5.setToolTipText("");
@@ -137,23 +137,23 @@ public class VistaLogin extends javax.swing.JFrame {
         jPanel_fondo.add(jPanel_encabezado);
         jPanel_encabezado.setBounds(0, 0, 800, 40);
 
-        jLabel1.setFont(new java.awt.Font("Roboto Medium", 1, 36)); // NOI18N
+        jLabel1.setFont(new java.awt.Font("Roboto Medium", 1, 36));
         jLabel1.setText("INICIAR SESIÓN");
         jPanel_fondo.add(jLabel1);
         jLabel1.setBounds(50, 150, 300, 50);
 
-        jLabel2.setFont(new java.awt.Font("Roboto", 0, 18)); // NOI18N
+        jLabel2.setFont(new java.awt.Font("Roboto", 0, 18));
         jLabel2.setText("CONTRASEÑA");
         jPanel_fondo.add(jLabel2);
         jLabel2.setBounds(50, 300, 150, 30);
 
-        txt_user.setFont(new java.awt.Font("Roboto Medium", 0, 14)); // NOI18N
+        txt_user.setFont(new java.awt.Font("Roboto Medium", 0, 14));
         txt_user.setForeground(new java.awt.Color(204, 204, 204));
         txt_user.setText("Ingrese su nombre de usuario");
         txt_user.setBorder(null);
         txt_user.setMaximumSize(new java.awt.Dimension(300, 30));
         txt_user.setMinimumSize(new java.awt.Dimension(300, 30));
-        txt_user.setName(""); // NOI18N
+        txt_user.setName("");
         txt_user.setPreferredSize(new java.awt.Dimension(300, 30));
         txt_user.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mousePressed(java.awt.event.MouseEvent evt) {
@@ -168,12 +168,12 @@ public class VistaLogin extends javax.swing.JFrame {
         jPanel_fondo.add(jSeparator1);
         jSeparator1.setBounds(50, 360, 300, 10);
 
-        jLabel3.setFont(new java.awt.Font("Roboto", 0, 18)); // NOI18N
+        jLabel3.setFont(new java.awt.Font("Roboto", 0, 18));
         jLabel3.setText("USUARIO");
         jPanel_fondo.add(jLabel3);
         jLabel3.setBounds(50, 220, 100, 20);
 
-        txt_password.setFont(new java.awt.Font("Roboto Medium", 0, 14)); // NOI18N
+        txt_password.setFont(new java.awt.Font("Roboto Medium", 0, 14));
         txt_password.setForeground(new java.awt.Color(204, 204, 204));
         txt_password.setText("***************");
         txt_password.setBorder(null);
@@ -198,7 +198,7 @@ public class VistaLogin extends javax.swing.JFrame {
         jPanel_ingresar.setMaximumSize(new java.awt.Dimension(150, 50));
         jPanel_ingresar.setMinimumSize(new java.awt.Dimension(150, 50));
 
-        label_ingresar.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
+        label_ingresar.setFont(new java.awt.Font("Roboto", 1, 14));
         label_ingresar.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         label_ingresar.setText("INGRESAR");
         label_ingresar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
@@ -254,11 +254,11 @@ public class VistaLogin extends javax.swing.JFrame {
     }
 
     private void jPanel_cerrarMousePressed(java.awt.event.MouseEvent evt) {
-        // TODO add your handling code here:
+        
     }
 
     private void jLabel5MousePressed(java.awt.event.MouseEvent evt) {
-        // TODO add your handling code here:
+        
     }
 
     private void jLabel5MouseClicked(java.awt.event.MouseEvent evt) {
@@ -301,7 +301,7 @@ public class VistaLogin extends javax.swing.JFrame {
         if(String.valueOf(txt_password.getPassword()).isEmpty()){
             txt_password.setText("***************");
             txt_password.setForeground(Color.gray);
-        }
+        } 
     }
 
     private void txt_passwordMousePressed(java.awt.event.MouseEvent evt) {

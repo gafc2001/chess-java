@@ -10,15 +10,27 @@ public class ImageUtil {
     public static void escalarImg(JLabel label, String rutaImagen) {
         try {
             ImageIcon imagenOriginal = cargarImagen(rutaImagen);
+            if (imagenOriginal == null) {
+                System.err.println("Imagen no encontrada: " + rutaImagen);
+                return;
+            }
 
             Image img = imagenOriginal.getImage();
             int ancholabel = label.getWidth();
             int altolabel = label.getHeight();
 
-            Image imagenEscalada = img.getScaledInstance(ancholabel, altolabel, Image.SCALE_SMOOTH);
+            if (ancholabel == 0 || altolabel == 0) {
+                ancholabel = label.getPreferredSize().width;
+                altolabel = label.getPreferredSize().height;
+            }
 
-            ImageIcon iconoEscalado = new ImageIcon(imagenEscalada);
-            label.setIcon(iconoEscalado);
+            if (ancholabel > 0 && altolabel > 0) {
+                Image imagenEscalada = img.getScaledInstance(ancholabel, altolabel, Image.SCALE_SMOOTH);
+                ImageIcon iconoEscalado = new ImageIcon(imagenEscalada);
+                label.setIcon(iconoEscalado);
+            } else {
+                label.setIcon(imagenOriginal);
+            }
         } catch (Exception e) {
             System.err.println("Error al escalar la imagen: " + e.getMessage());
             label.setText("Error Imagen");
