@@ -77,7 +77,10 @@ public class VistaMenuPrincipal extends JFrame {
         gbc.insets = new Insets(30, 0, 15, 0);
 
         // 3. Botones Verticales
-        pnlCentro.add(crearBoton("JUGAR 1vs1", true, e -> System.out.println("Jugar")), gbc);
+        pnlCentro.add(crearBoton("JUGAR 1vs1", true, e -> {
+            new VistaJuego().mostrar();
+            dispose();
+        }), gbc);
         
         gbc.insets = new Insets(15, 0, 15, 0); // Restaurar insets normales
         pnlCentro.add(crearBoton("MI PERFIL", false, e -> System.out.println("Perfil")), gbc);
