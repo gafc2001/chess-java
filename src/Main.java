@@ -1,14 +1,17 @@
-import dominio.modelos.*;
-import dominio.modelos.piezas.*;
-import dominio.enums.*;
+import aplicacion.casosuso.IniciarSesion;
+import infraestructura.persistencia.RepositorioUsuarioMemoria;
+import presentacion.controladores.ControladorLogin;
+import presentacion.vistas.VistaLogin;
+import javax.swing.SwingUtilities;
 
 public class Main {
     public static void main(String[] args) {
-        
-        Usuario gustavo = new Usuario("gafc2001", "Gustavo", "Farfan");
-
-        Tablero tablero = new Tablero();
-
-        System.out.println(gustavo.toString());
+        SwingUtilities.invokeLater(() -> {
+            RepositorioUsuarioMemoria repositorio = new RepositorioUsuarioMemoria();
+            IniciarSesion iniciarSesion = new IniciarSesion(repositorio);
+            VistaLogin vista = new VistaLogin();
+            ControladorLogin controlador = new ControladorLogin(vista, iniciarSesion);
+            controlador.iniciar();
+        });
     }
 }

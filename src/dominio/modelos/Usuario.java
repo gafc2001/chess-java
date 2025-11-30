@@ -14,11 +14,13 @@ public class Usuario {
     private int partidasGanadas;
     private int partidasPerdidas;
     private int partidasEmpatadas;
+    private String password;
     
-    public Usuario(String nombreUsuario, String nombre, String apellido) {
+    public Usuario(String nombreUsuario, String nombre, String apellido, String password) {
         this.nombreUsuario = nombreUsuario;
         this.nombre = nombre;
         this.apellido = apellido;
+        this.password = password;
         this.fechaRegistro = LocalDateTime.now();
         this.partidasJugadas = new ArrayList<>();
         this.partidasGanadas = 0;
@@ -62,6 +64,12 @@ public class Usuario {
     }
     public void setApellido(String apellido) {
         this.apellido = apellido;
+    }
+    public String getPassword() {
+        return password;
+    }
+    public void setPassword(String password) {
+        this.password = password;
     }
     public LocalDateTime getFechaRegistro() {
         return fechaRegistro;
