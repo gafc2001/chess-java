@@ -5,20 +5,36 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 import shared.utils.ImageUtil;
+import dominio.enums.TipoPieza;
+import dominio.modelos.piezas.Pieza;
+import dominio.modelos.Posicion;
+import dominio.modelos.Tablero;
+import dominio.modelos.Usuario;
+import dominio.puertos.IGestionarJuego;
+import aplicacion.casosuso.GestionarJuego;
 
 public class VistaJuego extends JFrame {
 
     private JPanel pnlTablero;
     private JPanel pnlInfo;
     private JPanel[][] casillas;
+    
+    private IGestionarJuego gestionarJuego;
+    private Posicion seleccionOrigen;
 
     private final Color colorClaro = new Color(240, 217, 181);
     private final Color colorOscuro = new Color(181, 136, 99);
 
     public VistaJuego() {
+        // Inicializar juego (Mock users for now)
+        Usuario u1 = new Usuario("jugador1", "Jugador", "Uno", "pass1");
+        Usuario u2 = new Usuario("jugador2", "Jugador", "Dos", "pass2");
+        gestionarJuego = new GestionarJuego();
+        gestionarJuego.crearPartida(u1, u2);
+        
         initComponents();
         inicializarTablero();
-        colocarPiezasIniciales();
+        actualizarTablero();
     }
 
     private void initComponents() {
@@ -125,27 +141,102 @@ public class VistaJuego extends JFrame {
                 } else {
                     casilla.setBackground(colorOscuro);
                 }
+                
+                final int r = fila;
+                final int c = col;
+                casilla.addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mouseClicked(MouseEvent e) {
+                        manejarClick(new Posicion(r, c));
+                    }
+                });
+                
                 casillas[fila][col] = casilla;
                 pnlTablero.add(casilla);
             }
         }
     }
 
-    private void colocarPiezasIniciales() {
-        String[] piezas = {"torre", "caballo", "alfin", "reina", "rey", "alfin", "caballo", "torre"};
+    private void actualizarTablero() {
+        Tablero tablero = gestionarJuego.getTablero();
         
-        for (int i = 0; i < 8; i++) {
-            colocarPieza(0, i, piezas[i], "negro");
-            colocarPieza(1, i, "peon", "negro");
-        }
-
-        for (int i = 0; i < 8; i++) {
-            colocarPieza(6, i, "peon", "blanco");
-            colocarPieza(7, i, piezas[i], "blanco");
+        for (int fila = 0; fila < 8; fila++) {
+            for (int col = 0; col < 8; col++) {
+                JPanel casilla = casillas[fila][col];
+                casilla.removeAll();
+                
+                // Restaurar color de fondo
+                if ((fila + col) % 2 == 0) {
+                    casilla.setBackground(colorClaro);
+                } else {
+                    casilla.setBackground(colorOscuro);
+                }
+                
+                // Resaltar selección y movimientos posibles
+                Posicion posActual = new Posicion(fila, col);
+                if (seleccionOrigen != null) {
+                    if (posActual.equals(seleccionOrigen)) {
+                        casilla.setBackground(new Color(186, 202, 68)); // Color de selección
+                    } else {
+                        Pieza piezaSeleccionada = tablero.getPieza(seleccionOrigen);
+                        if (piezaSeleccionada != null && piezaSeleccionada.esMovimientoValido(posActual, tablero)) {
+                             // Indicador de movimiento posible (punto o borde)
+                             casilla.setBackground(new Color(214, 214, 189)); 
+                        }
+                    }
+                }
+                
+                Pieza pieza = tablero.getPieza(posActual);
+                if (pieza != null) {
+                    String tipo = obtenerNombrePieza(pieza.getTipo());
+                    String color = (pieza.getColor() == dominio.enums.Color.BLANCO) ? "blanco" : "negro";
+                    colocarPieza(casilla, tipo, color);
+                }
+                
+                casilla.revalidate();
+                casilla.repaint();
+            }
         }
     }
 
-    private void colocarPieza(int fila, int col, String tipo, String color) {
+    private void manejarClick(Posicion pos) {
+        Tablero tablero = gestionarJuego.getTablero();
+        Pieza piezaClickeada = tablero.getPieza(pos);
+        
+        if (seleccionOrigen == null) {
+            // Intentar seleccionar
+            if (piezaClickeada != null && piezaClickeada.getColor() == gestionarJuego.getTurnoActual()) {
+                seleccionOrigen = pos;
+                actualizarTablero();
+            }
+        } else {
+            // Intentar mover o cambiar selección
+            if (pos.equals(seleccionOrigen)) {
+                seleccionOrigen = null; // Deseleccionar
+                actualizarTablero();
+            } else {
+                if (gestionarJuego.realizarMovimiento(seleccionOrigen, pos)) {
+                    seleccionOrigen = null;
+                    actualizarTablero();
+                } else {
+                    // Si clickea en otra pieza propia, cambiar selección
+                    if (piezaClickeada != null && piezaClickeada.getColor() == gestionarJuego.getTurnoActual()) {
+                        seleccionOrigen = pos;
+                        actualizarTablero();
+                    }
+                }
+            }
+        }
+    }
+
+    private String obtenerNombrePieza(TipoPieza tipo) {
+        switch (tipo) {
+            case ALFIL: return "alfin"; // Nombre de archivo
+            default: return tipo.toString().toLowerCase();
+        }
+    }
+
+    private void colocarPieza(JPanel casilla, String tipo, String color) {
         String ruta = "assets/piezas/" + tipo + "_" + color + ".png";
         JLabel lblPieza = new JLabel();
         lblPieza.setHorizontalAlignment(SwingConstants.CENTER);
@@ -153,9 +244,9 @@ public class VistaJuego extends JFrame {
         lblPieza.setSize(80, 80);
         ImageUtil.escalarImgMantenerProporcion(lblPieza, ruta);
         
-        casillas[fila][col].add(lblPieza, BorderLayout.CENTER);
+        casilla.add(lblPieza, BorderLayout.CENTER);
     }
-
+    
     public void mostrar() {
         this.setVisible(true);
     }

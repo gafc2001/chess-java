@@ -19,7 +19,11 @@ public abstract class Pieza {
     }
     
     public abstract List<Posicion> getMovimientosPosibles(Tablero tablero);
-    public abstract boolean esMovimientoValido(Posicion destino, Tablero tablero);
+
+    public boolean esMovimientoValido(Posicion destino, Tablero tablero){
+        List<Posicion> movimientos = getMovimientosPosibles(tablero);
+        return movimientos.contains(destino);
+    }
     
     public void mover(Posicion nuevaPosicion) {
         this.posicion = nuevaPosicion;

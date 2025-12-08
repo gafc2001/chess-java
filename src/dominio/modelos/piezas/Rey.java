@@ -17,12 +17,24 @@ public class Rey extends Pieza {
     @Override
     public List<Posicion> getMovimientosPosibles(Tablero tablero) {
         List<Posicion> movimientos = new ArrayList<>();
+        int[][] direcciones = {
+            {1, 0}, {-1, 0}, {0, 1}, {0, -1},
+            {1, 1}, {1, -1}, {-1, 1}, {-1, -1}
+        };
+        
+        for (int[] dir : direcciones) {
+            int fila = posicion.getFila() + dir[0];
+            int col = posicion.getColumna() + dir[1];
+            
+            Posicion nuevaPos = new Posicion(fila, col);
+            if (nuevaPos.esValida()) {
+                Pieza pieza = tablero.getPieza(nuevaPos);
+                if (pieza == null || esEnemiga(pieza)) {
+                    movimientos.add(nuevaPos);
+                }
+            }
+        }
         
         return movimientos;
-    }
-    
-    @Override
-    public boolean esMovimientoValido(Posicion destino, Tablero tablero) {
-        return true;
     }
 }

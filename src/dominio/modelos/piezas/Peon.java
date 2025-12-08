@@ -17,12 +17,38 @@ public class Peon extends Pieza {
     @Override
     public List<Posicion> getMovimientosPosibles(Tablero tablero) {
         List<Posicion> movimientos = new ArrayList<>();
+        int direccion = (this.color == Color.BLANCO) ? -1 : 1;
+        int filaInicio = (this.color == Color.BLANCO) ? 6 : 1;
+        
+        int filaActual = posicion.getFila();
+        int colActual = posicion.getColumna();
+        
+        // Movimiento simple adelante
+        Posicion frente = new Posicion(filaActual + direccion, colActual);
+        if (frente.esValida() && tablero.getPieza(frente) == null) {
+            movimientos.add(frente);
+            
+            // Movimiento doble inicial
+            if (filaActual == filaInicio) {
+                Posicion frente2 = new Posicion(filaActual + 2 * direccion, colActual);
+                if (frente2.esValida() && tablero.getPieza(frente2) == null) {
+                    movimientos.add(frente2);
+                }
+            }
+        }
+        
+        // Capturas diagonales
+        int[] colsCaptura = {colActual - 1, colActual + 1};
+        for (int col : colsCaptura) {
+            Posicion diagonal = new Posicion(filaActual + direccion, col);
+            if (diagonal.esValida()) {
+                Pieza piezaDestino = tablero.getPieza(diagonal);
+                if (piezaDestino != null && esEnemiga(piezaDestino)) {
+                    movimientos.add(diagonal);
+                }
+            }
+        }
         
         return movimientos;
-    }
-    
-    @Override
-    public boolean esMovimientoValido(Posicion destino, Tablero tablero) {
-        return true;
     }
 }

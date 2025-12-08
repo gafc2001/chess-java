@@ -11,7 +11,7 @@ public class Posicion {
     
     public Posicion(String notacion) {
         this.columna = notacion.charAt(0) - 'a';
-        this.fila = notacion.charAt(1) - '1';
+        this.fila = '8' - notacion.charAt(1);
     }
     
     public boolean esValida() {
@@ -19,7 +19,7 @@ public class Posicion {
     }
     
     public String toNotacion() {
-        return "" + (char)('a' + columna) + (char)('1' + fila);
+        return "" + (char)('a' + columna) + (8 - fila);
     }
     
     public int getFila() {
