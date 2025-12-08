@@ -33,7 +33,7 @@ public class Torre extends Pieza {
                     if (esEnemiga(pieza)) {
                         movimientos.add(nuevaPos);
                     }
-                    break; // Bloqueado por pieza (amiga o enemiga)
+                    break;
                 }
                 
                 fila += dir[0];

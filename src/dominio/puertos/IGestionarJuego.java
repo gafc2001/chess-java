@@ -12,4 +12,6 @@ public interface IGestionarJuego {
     Tablero getTablero();
     Color getTurnoActual();
     Partida getPartidaActual();
+    boolean estaEnJaque(Color color);
+    boolean estaEnJaqueMate(Color color);
 }

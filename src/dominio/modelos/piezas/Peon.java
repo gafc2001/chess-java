@@ -23,12 +23,11 @@ public class Peon extends Pieza {
         int filaActual = posicion.getFila();
         int colActual = posicion.getColumna();
         
-        // Movimiento simple adelante
         Posicion frente = new Posicion(filaActual + direccion, colActual);
         if (frente.esValida() && tablero.getPieza(frente) == null) {
             movimientos.add(frente);
             
-            // Movimiento doble inicial
+            
             if (filaActual == filaInicio) {
                 Posicion frente2 = new Posicion(filaActual + 2 * direccion, colActual);
                 if (frente2.esValida() && tablero.getPieza(frente2) == null) {
@@ -37,7 +36,6 @@ public class Peon extends Pieza {
             }
         }
         
-        // Capturas diagonales
         int[] colsCaptura = {colActual - 1, colActual + 1};
         for (int col : colsCaptura) {
             Posicion diagonal = new Posicion(filaActual + direccion, col);

@@ -30,7 +30,10 @@ public class Rey extends Pieza {
             if (nuevaPos.esValida()) {
                 Pieza pieza = tablero.getPieza(nuevaPos);
                 if (pieza == null || esEnemiga(pieza)) {
-                    movimientos.add(nuevaPos);
+                    Color colorEnemigo = (this.color == Color.BLANCO) ? Color.NEGRO : Color.BLANCO;
+                    if (!tablero.esCasillaAtacada(nuevaPos, colorEnemigo)) {
+                        movimientos.add(nuevaPos);
+                    }
                 }
             }
         }

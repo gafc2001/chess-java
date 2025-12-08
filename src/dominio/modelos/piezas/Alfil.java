@@ -33,7 +33,7 @@ public class Alfil extends Pieza {
                     if (esEnemiga(pieza)) {
                         movimientos.add(nuevaPos);
                     }
-                    break; // Bloqueado por pieza
+                    break;
                 }
                 
                 fila += dir[0];

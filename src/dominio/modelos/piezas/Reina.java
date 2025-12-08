@@ -36,7 +36,7 @@ public class Reina extends Pieza {
                     if (esEnemiga(pieza)) {
                         movimientos.add(nuevaPos);
                     }
-                    break; // Bloqueado
+                    break;
                 }
                 
                 fila += dir[0];

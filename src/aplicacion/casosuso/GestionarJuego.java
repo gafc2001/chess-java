@@ -38,4 +38,16 @@ public class GestionarJuego implements IGestionarJuego {
     public Partida getPartidaActual() {
         return partidaActual;
     }
+
+    @Override
+    public boolean estaEnJaque(Color color) {
+        if (partidaActual == null) return false;
+        return partidaActual.getTablero().estaEnJaque(color);
+    }
+
+    @Override
+    public boolean estaEnJaqueMate(Color color) {
+        if (partidaActual == null) return false;
+        return partidaActual.getTablero().estaEnJaqueMate(color);
+    }
 }

@@ -18,6 +18,8 @@ public class VistaJuego extends JFrame {
     private JPanel pnlTablero;
     private JPanel pnlInfo;
     private JPanel[][] casillas;
+    private JPanel pnlJugador1;
+    private JPanel pnlJugador2;
     
     private IGestionarJuego gestionarJuego;
     private Posicion seleccionOrigen;
@@ -26,7 +28,6 @@ public class VistaJuego extends JFrame {
     private final Color colorOscuro = new Color(181, 136, 99);
 
     public VistaJuego() {
-        // Inicializar juego (Mock users for now)
         Usuario u1 = new Usuario("jugador1", "Jugador", "Uno", "pass1");
         Usuario u2 = new Usuario("jugador2", "Jugador", "Dos", "pass2");
         gestionarJuego = new GestionarJuego();
@@ -35,6 +36,7 @@ public class VistaJuego extends JFrame {
         initComponents();
         inicializarTablero();
         actualizarTablero();
+        actualizarTurno();
     }
 
     private void initComponents() {
@@ -60,10 +62,10 @@ public class VistaJuego extends JFrame {
         pnlInfo = new JPanel(new GridLayout(2, 1));
         pnlInfo.setBackground(Color.WHITE);
         
-        JPanel pnlJugador2 = crearPanelJugador("Jugador 2 (Negras)", "assets/images/user.png");
+        pnlJugador2 = crearPanelJugador("Jugador 2 (Negras)", "assets/images/user.png");
         pnlInfo.add(pnlJugador2);
         
-        JPanel pnlJugador1 = crearPanelJugador("Jugador 1 (Blancas)", "assets/images/user.png");
+        pnlJugador1 = crearPanelJugador("Jugador 1 (Blancas)", "assets/images/user.png");
         pnlInfo.add(pnlJugador1);
 
         gbc.gridx = 1;
@@ -165,22 +167,19 @@ public class VistaJuego extends JFrame {
                 JPanel casilla = casillas[fila][col];
                 casilla.removeAll();
                 
-                // Restaurar color de fondo
                 if ((fila + col) % 2 == 0) {
                     casilla.setBackground(colorClaro);
                 } else {
                     casilla.setBackground(colorOscuro);
                 }
                 
-                // Resaltar selección y movimientos posibles
                 Posicion posActual = new Posicion(fila, col);
                 if (seleccionOrigen != null) {
                     if (posActual.equals(seleccionOrigen)) {
-                        casilla.setBackground(new Color(186, 202, 68)); // Color de selección
+                        casilla.setBackground(new Color(186, 202, 68)); 
                     } else {
                         Pieza piezaSeleccionada = tablero.getPieza(seleccionOrigen);
                         if (piezaSeleccionada != null && piezaSeleccionada.esMovimientoValido(posActual, tablero)) {
-                             // Indicador de movimiento posible (punto o borde)
                              casilla.setBackground(new Color(214, 214, 189)); 
                         }
                     }
@@ -204,22 +203,21 @@ public class VistaJuego extends JFrame {
         Pieza piezaClickeada = tablero.getPieza(pos);
         
         if (seleccionOrigen == null) {
-            // Intentar seleccionar
             if (piezaClickeada != null && piezaClickeada.getColor() == gestionarJuego.getTurnoActual()) {
                 seleccionOrigen = pos;
                 actualizarTablero();
             }
         } else {
-            // Intentar mover o cambiar selección
             if (pos.equals(seleccionOrigen)) {
-                seleccionOrigen = null; // Deseleccionar
+                seleccionOrigen = null;
                 actualizarTablero();
             } else {
                 if (gestionarJuego.realizarMovimiento(seleccionOrigen, pos)) {
                     seleccionOrigen = null;
                     actualizarTablero();
+                    actualizarTurno();
+                    verificarEstadoJuego();
                 } else {
-                    // Si clickea en otra pieza propia, cambiar selección
                     if (piezaClickeada != null && piezaClickeada.getColor() == gestionarJuego.getTurnoActual()) {
                         seleccionOrigen = pos;
                         actualizarTablero();
@@ -249,5 +247,37 @@ public class VistaJuego extends JFrame {
     
     public void mostrar() {
         this.setVisible(true);
+    }
+
+    private void actualizarTurno() {
+        dominio.enums.Color turno = gestionarJuego.getTurnoActual();
+        if (turno == dominio.enums.Color.BLANCO) {
+            pnlJugador1.setBackground(new Color(220, 255, 220));
+            pnlJugador2.setBackground(Color.WHITE);
+        } else {
+            pnlJugador1.setBackground(Color.WHITE);
+            pnlJugador2.setBackground(new Color(220, 255, 220));
+        }
+    }
+
+    private void verificarEstadoJuego() {
+        dominio.enums.Color turnoActual = gestionarJuego.getTurnoActual();
+        if (gestionarJuego.estaEnJaque(turnoActual)) {
+            if (gestionarJuego.estaEnJaqueMate(turnoActual)) {
+                JOptionPane.showMessageDialog(this, 
+                    "¡JAQUE MATE! Ganaron las " + (turnoActual == dominio.enums.Color.BLANCO ? "Negras" : "Blancas"), 
+                    "Fin del Juego", 
+                    JOptionPane.INFORMATION_MESSAGE);
+                
+                new VistaMenuPrincipal().mostrar();
+                dispose();
+            } else {
+                System.out.println("Estas en jaque");
+                JOptionPane.showMessageDialog(this, 
+                    "¡ESTÁS EN JAQUE!", 
+                    "Alerta", 
+                    JOptionPane.WARNING_MESSAGE);
+            }
+        }
     }
 }

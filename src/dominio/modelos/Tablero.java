@@ -3,6 +3,8 @@ package dominio.modelos;
 import dominio.enums.Color;
 import dominio.modelos.piezas.*;
 
+import java.util.List;
+
 public class Tablero {
     private Pieza[][] tablero;
     
@@ -18,7 +20,6 @@ public class Tablero {
             }
         }
         
-        // Piezas Negras (Arriba - Fila 0 y 1)
         tablero[0][0] = new Torre(Color.NEGRO, new Posicion(0, 0));
         tablero[0][1] = new Caballo(Color.NEGRO, new Posicion(0, 1));
         tablero[0][2] = new Alfil(Color.NEGRO, new Posicion(0, 2));
@@ -32,7 +33,6 @@ public class Tablero {
             tablero[1][columna] = new Peon(Color.NEGRO, new Posicion(1, columna));
         }
         
-        // Piezas Blancas (Abajo - Fila 6 y 7)
         tablero[7][0] = new Torre(Color.BLANCO, new Posicion(7, 0));
         tablero[7][1] = new Caballo(Color.BLANCO, new Posicion(7, 1));
         tablero[7][2] = new Alfil(Color.BLANCO, new Posicion(7, 2));
@@ -72,9 +72,101 @@ public class Tablero {
         if (pieza == null) return false;
         if (!pieza.esMovimientoValido(destino, this)) return false;
         
-        removerPieza(origen);
-        setPieza(destino, pieza);
+        Pieza piezaCapturada = getPieza(destino);
         
+        tablero[destino.getFila()][destino.getColumna()] = pieza;
+        tablero[origen.getFila()][origen.getColumna()] = null;
+        pieza.mover(destino);
+        
+        if (estaEnJaque(pieza.getColor())) {
+            pieza.mover(origen);
+            tablero[origen.getFila()][origen.getColumna()] = pieza;
+            tablero[destino.getFila()][destino.getColumna()] = piezaCapturada;
+            return false;
+        }
+        
+        return true;
+    }
+
+    public Posicion getPosicionRey(Color color) {
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                Pieza p = tablero[i][j];
+                if (p != null && p instanceof Rey && p.getColor() == color) {
+                    return p.getPosicion();
+                }
+            }
+        }
+        return null;
+    }
+
+    public boolean esCasillaAtacada(Posicion pos, Color colorAtacante) {
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                Pieza p = tablero[i][j];
+                if (p != null && p.getColor() == colorAtacante) {
+                    if (p instanceof Peon) {
+                        int direccion = (p.getColor() == Color.BLANCO) ? -1 : 1;
+                        int filaAtaque = p.getPosicion().getFila() + direccion;
+                        if (filaAtaque == pos.getFila()) {
+                            if (Math.abs(p.getPosicion().getColumna() - pos.getColumna()) == 1) {
+                                return true;
+                            }
+                        }
+                    } else if (p instanceof Rey) {
+                        if (Math.abs(p.getPosicion().getFila() - pos.getFila()) <= 1 &&
+                            Math.abs(p.getPosicion().getColumna() - pos.getColumna()) <= 1) {
+                            return true;
+                        }
+                    } else {
+                        if (p.esMovimientoValido(pos, this)) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    public boolean estaEnJaque(Color colorRey) {
+        Posicion posRey = getPosicionRey(colorRey);
+        if (posRey == null) return false;
+        
+        Color colorEnemigo = (colorRey == Color.BLANCO) ? Color.NEGRO : Color.BLANCO;
+        return esCasillaAtacada(posRey, colorEnemigo);
+    }
+
+    public boolean estaEnJaqueMate(Color colorRey) {
+        if (!estaEnJaque(colorRey)) return false;
+
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                Pieza p = tablero[i][j];
+                if (p != null && p.getColor() == colorRey) {
+                    List<Posicion> movimientos = p.getMovimientosPosibles(this);
+                    Posicion origen = p.getPosicion();
+
+                    for (Posicion destino : movimientos) {
+                        Pieza piezaCapturada = getPieza(destino);
+                        
+                        tablero[destino.getFila()][destino.getColumna()] = p;
+                        tablero[origen.getFila()][origen.getColumna()] = null;
+                        p.mover(destino);
+
+                        boolean sigueEnJaque = estaEnJaque(colorRey);
+
+                        p.mover(origen);
+                        tablero[origen.getFila()][origen.getColumna()] = p;
+                        tablero[destino.getFila()][destino.getColumna()] = piezaCapturada;
+
+                        if (!sigueEnJaque) {
+                            return false;
+                        }
+                    }
+                }
+            }
+        }
         return true;
     }
 }
