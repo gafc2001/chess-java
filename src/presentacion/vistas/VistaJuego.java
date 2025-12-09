@@ -5,12 +5,12 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 import shared.utils.ImageUtil;
-import dominio.enums.TipoPieza;
 import dominio.modelos.piezas.Pieza;
 import dominio.modelos.Posicion;
 import dominio.modelos.Tablero;
 import dominio.modelos.Usuario;
 import dominio.puertos.IGestionarJuego;
+import aplicacion.Sesion;
 import aplicacion.casosuso.GestionarJuego;
 
 public class VistaJuego extends JFrame {
@@ -28,7 +28,7 @@ public class VistaJuego extends JFrame {
     private final Color colorOscuro = new Color(181, 136, 99);
 
     public VistaJuego() {
-        Usuario u1 = new Usuario("jugador1", "Jugador", "Uno", "pass1");
+        Usuario u1 = Sesion.usuario();
         Usuario u2 = new Usuario("jugador2", "Jugador", "Dos", "pass2");
         gestionarJuego = new GestionarJuego();
         gestionarJuego.crearPartida(u1, u2);

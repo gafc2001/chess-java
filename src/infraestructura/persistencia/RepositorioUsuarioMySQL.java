@@ -40,7 +40,7 @@ public class RepositorioUsuarioMySQL implements RepositorioUsuario {
             stmt.setString(1, usuario.getNombreUsuario());
             stmt.setString(2, usuario.getNombre());
             stmt.setString(3, usuario.getApellido());
-            stmt.setString(4, usuario.getPassword());
+            stmt.setString(4, Usuario.hashearPassword(usuario.getPassword()));
             stmt.setInt(5, usuario.getPartidasGanadas());
             stmt.setInt(6, usuario.getPartidasPerdidas());
             stmt.setInt(7, usuario.getPartidasEmpatadas());

@@ -5,7 +5,7 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 
-import dominio.modelos.Usuario;
+import aplicacion.Sesion;
 import shared.utils.ImageUtil;
 
 public class VistaMenuPrincipal extends JFrame {
@@ -76,13 +76,20 @@ public class VistaMenuPrincipal extends JFrame {
         
         gbc.insets = new Insets(15, 0, 15, 0);
         pnlCentro.add(crearBoton("MI PERFIL", false, e -> {
-            new VistaEditarPerfil(new Usuario("aramirez", "Alma", "Ramirez Arias", "123456")).mostrar();
+            new VistaEditarPerfil(Sesion.usuario()).mostrar();
             dispose();
         }), gbc);
         pnlCentro.add(crearBoton("RANKING", false, e -> {
             new VistaRanking().mostrar();
             dispose();
         }), gbc);
+
+        if (Sesion.usuario().getEsAdmin()) {
+            pnlCentro.add(crearBoton("CREAR USUARIO", false, e -> {
+                new VistaCrearUsuario().mostrar();
+                dispose();
+            }), gbc);
+        }
         pnlCentro.add(crearBoton("CERRAR SESIÓN", false, e -> System.out.println("Ranking")), gbc);
 
         jPanel_fondo.add(pnlCentro, BorderLayout.CENTER);

@@ -1,5 +1,6 @@
 package aplicacion.casosuso;
 
+import aplicacion.Sesion;
 import dominio.modelos.Usuario;
 import dominio.puertos.RepositorioUsuario;
 
@@ -14,6 +15,7 @@ public class IniciarSesion {
         Usuario usuario = repositorioUsuario.buscarPorNombreUsuario(nombreUsuario);
         
         if (usuario != null && usuario.verificarPassword(clave)) {
+            Sesion.iniciarSesion(usuario);
             return usuario;
         }
         
