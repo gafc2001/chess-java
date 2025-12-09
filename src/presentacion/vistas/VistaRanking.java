@@ -1,7 +1,8 @@
 package presentacion.vistas;
 
 import dominio.modelos.Usuario;
-import infraestructura.persistencia.RepositorioUsuarioMemoria;
+import dominio.puertos.RepositorioUsuario;
+import infraestructura.persistencia.RepositorioUsuarioMySQL;
 import shared.utils.ImageUtil;
 import java.awt.*;
 import java.awt.event.*;
@@ -16,7 +17,7 @@ public class VistaRanking extends JFrame {
     private JPanel pnlRanking;
 
     public VistaRanking() {
-        RepositorioUsuarioMemoria repo = new RepositorioUsuarioMemoria();
+        RepositorioUsuario repo = new RepositorioUsuarioMySQL();
         this.usuarios = repo.obtenerUsuarios();
         initComponents();
         cargarRanking();

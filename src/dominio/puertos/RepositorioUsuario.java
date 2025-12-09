@@ -5,7 +5,7 @@ import java.util.List;
 import dominio.modelos.Usuario;
 
 public interface RepositorioUsuario {
-    Usuario buscarPorCorreo(String correo);
+    Usuario buscarPorNombreUsuario(String nombreUsuario);
     void guardar(Usuario usuario);
     List<Usuario> obtenerUsuarios();
 }

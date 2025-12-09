@@ -10,10 +10,10 @@ public class IniciarSesion {
         this.repositorioUsuario = repositorioUsuario;
     }
 
-    public Usuario ejecutar(String correo, String clave) {
-        Usuario usuario = repositorioUsuario.buscarPorCorreo(correo);
+    public Usuario ejecutar(String nombreUsuario, String clave) {
+        Usuario usuario = repositorioUsuario.buscarPorNombreUsuario(nombreUsuario);
         
-        if (usuario != null && usuario.getPassword().equals(clave)) {
+        if (usuario != null && usuario.verificarPassword(clave)) {
             return usuario;
         }
         

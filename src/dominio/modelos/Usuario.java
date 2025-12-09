@@ -1,5 +1,8 @@
 package dominio.modelos;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,6 +14,7 @@ public class Usuario {
     private String apellido;
     private LocalDateTime fechaRegistro;
     private List<Partida> partidasJugadas;
+    private boolean esAdmin;
     private int partidasGanadas;
     private int partidasPerdidas;
     private int partidasEmpatadas;
@@ -86,7 +90,49 @@ public class Usuario {
     public int getPartidasEmpatadas() {
         return partidasEmpatadas;
     }
+
+    public void setPartidasGanadas(int partidasGanadas) {
+        this.partidasGanadas = partidasGanadas;
+    }
+
+    public void setPartidasPerdidas(int partidasPerdidas) {
+        this.partidasPerdidas = partidasPerdidas;
+    }
+
+    public void setPartidasEmpatadas(int partidasEmpatadas) {
+        this.partidasEmpatadas = partidasEmpatadas;
+    }
+
+    public void setEsAdmin(boolean esAdmin) {
+        this.esAdmin = esAdmin;
+    }
+
+    public boolean getEsAdmin() {
+        return esAdmin;
+    }
     
+    public boolean verificarPassword(String passwordAuth) {
+        return this.password.equals(hashearPassword(passwordAuth));
+    }
+
+    public static String hashearPassword(String password) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] encodedhash = digest.digest(password.getBytes(StandardCharsets.UTF_8));
+            StringBuilder hexString = new StringBuilder(2 * encodedhash.length);
+            for (int i = 0; i < encodedhash.length; i++) {
+                String hex = Integer.toHexString(0xff & encodedhash[i]);
+                if (hex.length() == 1) {
+                    hexString.append('0');
+                }
+                hexString.append(hex);
+            }
+            return hexString.toString();
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException("Error al hashear el password", e);
+        }
+    }
+
     @Override
     public String toString() {
         return "Usuario{" +

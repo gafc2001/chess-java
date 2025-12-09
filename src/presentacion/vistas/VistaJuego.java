@@ -187,7 +187,7 @@ public class VistaJuego extends JFrame {
                 
                 Pieza pieza = tablero.getPieza(posActual);
                 if (pieza != null) {
-                    String tipo = obtenerNombrePieza(pieza.getTipo());
+                    String tipo = pieza.getTipo().toString().toLowerCase();
                     String color = (pieza.getColor() == dominio.enums.Color.BLANCO) ? "blanco" : "negro";
                     colocarPieza(casilla, tipo, color);
                 }
@@ -224,13 +224,6 @@ public class VistaJuego extends JFrame {
                     }
                 }
             }
-        }
-    }
-
-    private String obtenerNombrePieza(TipoPieza tipo) {
-        switch (tipo) {
-            case ALFIL: return "alfin"; // Nombre de archivo
-            default: return tipo.toString().toLowerCase();
         }
     }
 

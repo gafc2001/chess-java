@@ -1,5 +1,6 @@
 import aplicacion.casosuso.IniciarSesion;
-import infraestructura.persistencia.RepositorioUsuarioMemoria;
+import dominio.puertos.RepositorioUsuario;
+import infraestructura.persistencia.RepositorioUsuarioMySQL;
 import presentacion.controladores.ControladorLogin;
 import presentacion.vistas.VistaLogin;
 import javax.swing.SwingUtilities;
@@ -7,7 +8,7 @@ import javax.swing.SwingUtilities;
 public class Main {
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
-            RepositorioUsuarioMemoria repositorio = new RepositorioUsuarioMemoria();
+            RepositorioUsuario repositorio = new RepositorioUsuarioMySQL();
             IniciarSesion iniciarSesion = new IniciarSesion(repositorio);
             VistaLogin vista = new VistaLogin();
             ControladorLogin controlador = new ControladorLogin(vista, iniciarSesion);
