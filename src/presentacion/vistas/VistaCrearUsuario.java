@@ -2,6 +2,7 @@ package presentacion.vistas;
 
 import aplicacion.casosuso.RegistrarUsuario;
 import dominio.modelos.Usuario;
+import dominio.modelos.UsuarioBuilder;
 import infraestructura.persistencia.RepositorioUsuarioMySQL;
 import shared.utils.ImageUtil;
 
@@ -120,25 +121,21 @@ public class VistaCrearUsuario extends JFrame {
     }
 
     private void guardarUsuario() {
-        String nombreUsuario = txtNombreUsuario.getText().trim();
-        String nombre = txtNombre.getText().trim();
-        String apellido = txtApellido.getText().trim();
-        String password = new String(txtPassword.getPassword());
-        boolean esAdmin = chkEsAdmin.isSelected();
-
-        if (nombreUsuario.isEmpty() || nombre.isEmpty() || apellido.isEmpty() || password.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Todos los campos sone obligatorios.", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
-        Usuario nuevoUsuario = new Usuario(nombreUsuario, nombre, apellido, password);
-        nuevoUsuario.setEsAdmin(esAdmin);
-
         try {
+            Usuario nuevoUsuario = new UsuarioBuilder()
+                    .nombreUsuario(txtNombreUsuario.getText().trim())
+                    .nombre(txtNombre.getText().trim())
+                    .apellido(txtApellido.getText().trim())
+                    .password(new String(txtPassword.getPassword()))
+                    .esAdmin(chkEsAdmin.isSelected())
+                    .build();
+
             RegistrarUsuario registrarUsuarioCaso = new RegistrarUsuario(new RepositorioUsuarioMySQL());
             registrarUsuarioCaso.ejecutar(nuevoUsuario);
             JOptionPane.showMessageDialog(this, "Usuario creado exitosamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
             dispose();
+        } catch (IllegalStateException e) {
+            JOptionPane.showMessageDialog(this, e.getMessage(), "Campos incompletos", JOptionPane.WARNING_MESSAGE);
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Error al crear usuario: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();
