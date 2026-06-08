@@ -8,8 +8,8 @@ public class DB {
     private static DB instancia;
     private Connection conexion;
     private static final String URL = "jdbc:mysql://localhost:3306/chess_game?allowPublicKeyRetrieval=true&useSSL=false";
-    private static final String USUARIO = "admin";
-    private static final String PASSWORD = "admin";
+    private static final String USUARIO = "root";
+    private static final String PASSWORD = "$pth6fuX%dG1M$#MJ*mr";
 
     private DB() {
         try {
