@@ -6,7 +6,9 @@ import javax.swing.*;
 import javax.swing.border.LineBorder;
 import shared.utils.ImageUtil;
 import dominio.modelos.piezas.Pieza;
+import dominio.modelos.ColaMovimientos;
 import dominio.modelos.NodoMovimiento;
+import dominio.modelos.NodoMovimientoPendiente;
 import dominio.modelos.Posicion;
 import dominio.modelos.Tablero;
 import dominio.modelos.Usuario;
@@ -36,6 +38,8 @@ public class VistaJuego extends JFrame {
     private String idPartidaOnline;
     private boolean esCreador;
     private Timer timerSincronizacion;
+    private Timer timerAplicarPendientes;
+    private final ColaMovimientos movimientosPendientes = new ColaMovimientos();
 
     private final Color colorClaro = new Color(240, 217, 181);
     private final Color colorOscuro = new Color(181, 136, 99);
@@ -434,6 +438,7 @@ public class VistaJuego extends JFrame {
 
             // El oponente regresó su último movimiento
             if (movesDBSize < gestionarJuego.getPartidaActual().getHistorial().getTamanio()) {
+                movimientosPendientes.vaciar();
                 if (gestionarJuego.retrocederMovimiento(colorOponente)) {
                     seleccionOrigen = null;
                     actualizarTablero();
@@ -447,26 +452,40 @@ public class VistaJuego extends JFrame {
                     String[] moves = movsDB.split(",");
                     int localMovesSize = gestionarJuego.getPartidaActual().getHistorial().getTamanio();
 
-                    if (moves.length > localMovesSize) {
+                    // La BD es la fuente de verdad: la cola se reconstruye con lo que falta aplicar,
+                    // asi un movimiento que el oponente retrocedio antes de aplicarse desaparece de la cola
+                    if (moves.length > localMovesSize || !movimientosPendientes.estaVacia()) {
+                        movimientosPendientes.vaciar();
                         for (int i = localMovesSize; i < moves.length; i++) {
                             String nextMove = moves[i];
                             if (nextMove.contains("-")) {
                                 String[] parts = nextMove.split("-");
-                                Posicion origen = new Posicion(parts[0]);
-                                Posicion destino = new Posicion(parts[1]);
-                                
-                                if (gestionarJuego.realizarMovimiento(origen, destino)) {
-                                    actualizarTablero();
-                                    actualizarTurno();
-                                    verificarEstadoJuegoSilencioso();
-                                }
+                                movimientosPendientes.encolar(new NodoMovimientoPendiente(new Posicion(parts[0]), new Posicion(parts[1])));
                             }
                         }
+                        actualizarHistorialMovimientos();
                     }
                 }
             }
         });
         timerSincronizacion.start();
+
+        // Si por latencia llegan varios movimientos juntos, se aplican de a uno para que se vean en el tablero y en la tabla
+        timerAplicarPendientes = new Timer(500, e -> aplicarSiguientePendiente());
+        timerAplicarPendientes.start();
+    }
+
+    private void aplicarSiguientePendiente() {
+        NodoMovimientoPendiente siguiente = movimientosPendientes.desencolar();
+        if (siguiente == null) return;
+
+        if (gestionarJuego.realizarMovimiento(siguiente.getOrigen(), siguiente.getDestino())) {
+            actualizarTablero();
+            actualizarTurno();
+            verificarEstadoJuegoSilencioso();
+        } else {
+            actualizarHistorialMovimientos();
+        }
     }
 
     private void verificarEstadoJuegoSilencioso() {
@@ -502,6 +521,9 @@ public class VistaJuego extends JFrame {
     public void dispose() {
         if (timerSincronizacion != null) {
             timerSincronizacion.stop();
+        }
+        if (timerAplicarPendientes != null) {
+            timerAplicarPendientes.stop();
         }
         if (esOnline) {
             ServicioPartidaOnline.PartidaOnlineInfo partida = ServicioPartidaOnline.obtenerPartida(idPartidaOnline);
@@ -559,6 +581,15 @@ public class VistaJuego extends JFrame {
             modeloTablaMovimientos.addRow(new Object[]{numMovimiento, jugador, pieza, actual.toNotacion()});
             numMovimiento++;
             actual = actual.getSiguiente();
+        }
+
+        // Movimientos recibidos que esperan en la cola: los de indice par (desde 0) son de blancas
+        NodoMovimientoPendiente pendiente = movimientosPendientes.getFrente();
+        while (pendiente != null) {
+            String jugador = (numMovimiento - 1) % 2 == 0 ? "Blancas" : "Negras";
+            modeloTablaMovimientos.addRow(new Object[]{numMovimiento, jugador, "Pendiente", pendiente.toNotacion()});
+            numMovimiento++;
+            pendiente = pendiente.getSiguiente();
         }
 
         int ultimaFila = modeloTablaMovimientos.getRowCount() - 1;

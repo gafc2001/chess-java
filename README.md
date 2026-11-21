@@ -121,7 +121,7 @@ chess-java/
 │   │       └── RegistrarUsuario.java      # Caso de uso: registro
 │   ├── dominio/
 │   │   ├── enums/                         # Color, TipoPieza, EstadoJuego, etc.
-│   │   ├── modelos/                       # Tablero, Partida, Usuario, Piezas, HistorialMovimientos
+│   │   ├── modelos/                       # Tablero, Partida, Usuario, Piezas, HistorialMovimientos, ArbolRanking, ColaMovimientos
 │   │   └── puertos/                       # Interfaces / contratos
 │   ├── infraestructura/
 │   │   ├── mapper/                        # UsuarioMapper (ResultSet → Modelo)
@@ -213,3 +213,101 @@ Cada jugador puede **regresar su movimiento hasta 2 veces por partida** (`Partid
   2. `Tablero.deshacerMovimiento(nodo)` regresa la pieza a su `origen` y, si hubo captura, repone la `piezaCapturada` en el `destino`.
   3. El turno vuelve al jugador y se descuenta uno de sus retrocesos.
 - En partidas **online**, la lista de movimientos se actualiza en la base de datos y el rival detecta que es más corta que la suya, así que deshace el movimiento en su tablero.
+
+---
+
+## Ranking de jugadores (Árbol binario de búsqueda)
+
+El ranking se ordena con un **árbol binario de búsqueda (BST)** implementado a mano, sin usar `Collections.sort`, `stream().sorted()` ni `ORDER BY`.
+
+### Clases
+
+| Clase | Ubicación | Responsabilidad |
+|---|---|---|
+| `NodoRanking` | `src/dominio/modelos/` | Guarda un `Usuario` y las referencias `izquierdo` y `derecho` |
+| `ArbolRanking` | `src/dominio/modelos/` | El árbol: mantiene la `raiz` y el `tamanio` |
+
+La clave de ordenamiento son las **partidas ganadas** del usuario:
+
+- Menos victorias → subárbol **izquierdo**.
+- Más victorias → subárbol **derecho**.
+- **Empates** → subárbol **izquierdo**, para que en el recorrido se respete el orden en que llegaron desde la base de datos.
+
+```
+Insertando: ana(5), beto(9), caro(2), dani(5), eva(7), fede(0)
+
+                 ana(5)
+               /        \
+          caro(2)      beto(9)
+          /     \       /
+     fede(0)  dani(5) eva(7)
+```
+
+### Operaciones
+
+**`insertar(usuario)`** (recursivo): se compara con el nodo actual y se baja por la izquierda o por la derecha hasta encontrar un lugar vacío (`null`), donde se crea el nuevo nodo.
+
+**`aRanking()`**: **recorrido inorden inverso** (derecho → raíz → izquierdo). Devuelve los usuarios de **mayor a menor** cantidad de victorias:
+
+```
+beto(9) → eva(7) → ana(5) → dani(5) → caro(2) → fede(0)
+```
+
+`VistaRanking` inserta todos los usuarios en el árbol y dibuja las filas en el orden de `aRanking()`, con medallas para los 3 primeros.
+
+### Complejidad
+
+| Caso | Inserción | Motivo |
+|---|---|---|
+| Promedio | O(log n) | El árbol queda razonablemente balanceado |
+| Peor caso | O(n) | Si los usuarios llegan ya ordenados por victorias, el árbol degenera en una lista |
+
+El recorrido completo siempre es O(n).
+
+---
+
+## Movimientos pendientes online (Cola)
+
+En partidas **online**, cada cliente consulta la base de datos cada segundo. Si hay **latencia** (red lenta, la ventana se congeló un momento o el jugador se reconecta), pueden llegar **varios movimientos del rival juntos**. En vez de aplicarlos todos de golpe, se guardan en una **cola (FIFO)** implementada a mano y se aplican de a uno.
+
+### Clases
+
+| Clase | Ubicación | Responsabilidad |
+|---|---|---|
+| `NodoMovimientoPendiente` | `src/dominio/modelos/` | Un movimiento recibido: `origen`, `destino` y la referencia `siguiente` |
+| `ColaMovimientos` | `src/dominio/modelos/` | La cola: mantiene el `frente`, el `fin` y el `tamanio` |
+
+```
+  frente                          fin
+    │                              │
+    ▼                              ▼
+┌─────────┐    ┌─────────┐    ┌─────────┐
+│ e7-e5   │ ─► │ g1-f3   │ ─► │ b8-c6   │ ─► null
+└─────────┘    └─────────┘    └─────────┘
+ sale primero                  entró último
+```
+
+¿Por qué una cola y no una pila? Porque los movimientos se deben aplicar **en el mismo orden en que se jugaron**: el primero que llega es el primero que sale. Con una pila (LIFO) se aplicaría primero la última jugada y el tablero quedaría inconsistente.
+
+### Operaciones
+
+| Operación | Descripción |
+|---|---|
+| `encolar(nodo)` | Agrega por el `fin`. Si la cola está vacía, el nodo es también el `frente` |
+| `desencolar()` | Quita y devuelve el `frente` (o `null` si está vacía) |
+| `vaciar()` | Deja la cola vacía |
+| `getFrente()` | Permite recorrer la cola sin modificarla (para mostrarla en la tabla) |
+
+### Flujo en `VistaJuego`
+
+1. **Sincronización (cada 1 s)**: lee la lista de movimientos de la base de datos. Si tiene más movimientos que el historial local, **reconstruye la cola** con los que faltan aplicar. La base de datos es la fuente de verdad: si el rival regresó un movimiento que todavía no se había aplicado, ese movimiento desaparece de la cola.
+2. **Aplicación (cada 500 ms)**: se desencola **un** movimiento y se aplica al tablero. Así cada jugada se ve una por una.
+3. **Tabla de movimientos**: después de los movimientos ya jugados (lista doblemente enlazada), se muestran los que esperan en la cola con la pieza **"Pendiente"**. Cuando se aplican, pasan a ser filas normales:
+
+| Nº | Jugador | Pieza | Movimiento |
+|---|---|---|---|
+| 1 | Blancas | Peón | e2-e4 |
+| 2 | Negras | Pendiente | e7-e5 |
+| 3 | Blancas | Pendiente | g1-f3 |
+
+4. Si el rival **regresa un movimiento ya aplicado**, la cola se vacía y se deshace ese movimiento en el tablero, como antes.
