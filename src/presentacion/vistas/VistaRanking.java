@@ -1,5 +1,6 @@
 package presentacion.vistas;
 
+import dominio.modelos.ArbolRanking;
 import dominio.modelos.Usuario;
 import dominio.puertos.RepositorioUsuario;
 import infraestructura.persistencia.RepositorioUsuarioMySQL;
@@ -7,7 +8,6 @@ import shared.utils.ImageUtil;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.List;
-import java.util.stream.Collectors;
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 
@@ -77,9 +77,11 @@ public class VistaRanking extends JFrame {
     }
 
     private void cargarRanking() {
-        List<Usuario> ordenados = usuarios.stream()
-                .sorted((u1, u2) -> Integer.compare(u2.getPartidasGanadas(), u1.getPartidasGanadas()))
-                .collect(Collectors.toList());
+        ArbolRanking arbol = new ArbolRanking();
+        for (Usuario u : usuarios) {
+            arbol.insertar(u);
+        }
+        List<Usuario> ordenados = arbol.aRanking();
 
         for (int i = 0; i < ordenados.size(); i++) {
             Usuario u = ordenados.get(i);
